@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where Image endswith "\\certutil.exe" and ((CommandLine contains "urlcache" or CommandLine contains "verifyctl") or CommandLine contains "-decode")

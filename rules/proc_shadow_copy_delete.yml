@@ -1,0 +1,38 @@
+title: Shadow Copy / Backup Deletion (Ransomware Precursor)
+id: 4e1530ac-5a67-4bb0-b69e-0d65e80bf5e1
+status: test
+description: Deletion of volume shadow copies or backup catalogs, or disabling recovery, right before encryption.
+references:
+- https://attack.mitre.org/techniques/T1490/
+author: Praveen
+date: '2026-09-19'
+tags:
+- attack.impact
+- attack.t1490
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_vss:
+    CommandLine|contains|all:
+    - vssadmin
+    - delete
+    - shadows
+  sel_wmic:
+    CommandLine|contains|all:
+    - shadowcopy
+    - delete
+  sel_bcd:
+    CommandLine|contains|all:
+    - bcdedit
+    - recoveryenabled
+    - 'no'
+  sel_wbadmin:
+    CommandLine|contains|all:
+    - wbadmin
+    - delete
+    - catalog
+  condition: 1 of sel_*
+falsepositives:
+- Backup software housekeeping (allow-list by signed parent)
+level: critical

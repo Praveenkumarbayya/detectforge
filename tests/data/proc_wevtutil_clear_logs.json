@@ -1,0 +1,14 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\wevtutil.exe",
+      "CommandLine": "wevtutil cl Security"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\wevtutil.exe",
+      "CommandLine": "wevtutil qe Security /c:5"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+CommandLine IN ("*curl *", "*wget *")
+| regex CommandLine="\\|\\s*(sudo\\s+)?(ba)?sh(\\s|$)"

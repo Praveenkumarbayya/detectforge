@@ -1,0 +1,1 @@
+Image IN ("*\\net.exe", "*\\net1.exe") CommandLine="*user*" CommandLine="* /add*"

@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where (ParentImage endswith "\\winword.exe" or ParentImage endswith "\\excel.exe" or ParentImage endswith "\\powerpnt.exe" or ParentImage endswith "\\outlook.exe") and (Image endswith "\\cmd.exe" or Image endswith "\\powershell.exe" or Image endswith "\\wscript.exe" or Image endswith "\\cscript.exe" or Image endswith "\\mshta.exe")

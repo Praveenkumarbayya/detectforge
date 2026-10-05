@@ -1,0 +1,28 @@
+id: a2989499-cbe0-4e29-bec8-932ccb5664df
+name: Local User Account Created via net.exe
+description: Creation of a local account with 'net user /add' - backdoor account persistence.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- Persistence
+relevantTechniques:
+- T1136
+query: |
+  SysmonProcessCreate
+  | where (Image endswith "\\net.exe" or Image endswith "\\net1.exe") and (CommandLine contains "user" and CommandLine contains " /add")
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

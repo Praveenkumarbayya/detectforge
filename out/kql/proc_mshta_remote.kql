@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where Image endswith "\\mshta.exe" and (CommandLine contains "http://" or CommandLine contains "https://" or CommandLine contains "javascript:" or CommandLine contains "vbscript:")

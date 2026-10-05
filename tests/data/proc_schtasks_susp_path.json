@@ -1,0 +1,18 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\schtasks.exe",
+      "CommandLine": "schtasks /create /tn Updater /tr C:\\Users\\Public\\upd.exe /sc onlogon"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\schtasks.exe",
+      "CommandLine": "schtasks /query /fo LIST"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\schtasks.exe",
+      "CommandLine": "schtasks /create /tn Backup /tr C:\\Windows\\System32\\backup.bat /sc daily"
+    }
+  ]
+}

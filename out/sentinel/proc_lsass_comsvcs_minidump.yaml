@@ -1,0 +1,28 @@
+id: f1aefd9b-cf8f-4388-9ecf-8aca06b70733
+name: LSASS Memory Dump via comsvcs.dll MiniDump
+description: Credential dumping using rundll32 + comsvcs.dll MiniDump against the LSASS process.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- CredentialAccess
+relevantTechniques:
+- T1003
+query: |
+  SysmonProcessCreate
+  | where CommandLine contains "comsvcs" and CommandLine contains "MiniDump"
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

@@ -1,0 +1,32 @@
+title: Suspicious Encoded PowerShell Command
+id: 0e8d0ba2-5f08-4013-8e54-4a873edb4d68
+status: test
+description: PowerShell launched with an encoded command, a staple of malware loaders and hands-on-keyboard intrusion.
+references:
+- https://attack.mitre.org/techniques/T1059/001/
+author: Praveen
+date: '2026-09-19'
+tags:
+- attack.execution
+- attack.t1059.001
+- attack.defense_evasion
+- attack.t1027
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_img:
+    Image|endswith:
+    - \powershell.exe
+    - \pwsh.exe
+  sel_flag:
+    CommandLine|contains:
+    - ' -enc '
+    - ' -EncodedCommand '
+    - ' -ec '
+  filter_sccm:
+    ParentImage|endswith: \ccmexec.exe
+  condition: sel_img and sel_flag and not filter_sccm
+falsepositives:
+- Legitimate admin/deployment tooling that encodes scripts (tune by parent process)
+level: high

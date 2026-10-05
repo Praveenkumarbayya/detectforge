@@ -1,0 +1,31 @@
+title: Scheduled Task Created Pointing to User-Writable Path
+id: cc53268d-ede3-4d49-8cea-c6b1d00ed34d
+status: test
+description: Persistence via schtasks /create where the task runs a binary/script from Temp, AppData, ProgramData
+  or Public.
+references:
+- https://attack.mitre.org/techniques/T1053/005/
+author: Praveen
+date: '2026-09-19'
+tags:
+- attack.persistence
+- attack.execution
+- attack.t1053.005
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_img:
+    Image|endswith: \schtasks.exe
+  sel_create:
+    CommandLine|contains: /create
+  sel_path:
+    CommandLine|contains:
+    - \AppData\
+    - \Temp\
+    - \ProgramData\
+    - \Users\Public\
+  condition: sel_img and sel_create and sel_path
+falsepositives:
+- Software updaters that register tasks from AppData (e.g. browsers) - filter by task name
+level: medium

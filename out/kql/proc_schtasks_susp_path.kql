@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where Image endswith "\\schtasks.exe" and CommandLine contains "/create" and (CommandLine contains "\\AppData\\" or CommandLine contains "\\Temp\\" or CommandLine contains "\\ProgramData\\" or CommandLine contains "\\Users\\Public\\")

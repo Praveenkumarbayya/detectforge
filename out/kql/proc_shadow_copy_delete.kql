@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where (CommandLine contains "vssadmin" and CommandLine contains "delete" and CommandLine contains "shadows") or (CommandLine contains "shadowcopy" and CommandLine contains "delete") or (CommandLine contains "bcdedit" and CommandLine contains "recoveryenabled" and CommandLine contains "no") or (CommandLine contains "wbadmin" and CommandLine contains "delete" and CommandLine contains "catalog")

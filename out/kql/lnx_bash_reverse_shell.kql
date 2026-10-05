@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where (CommandLine contains "/dev/tcp/" or CommandLine contains "/dev/udp/") and (CommandLine contains "bash -i" or CommandLine contains "sh -i")

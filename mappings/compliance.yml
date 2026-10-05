@@ -1,0 +1,16 @@
+# Maps ATT&CK tactic -> regulatory / framework controls that a detection helps evidence.
+# Purpose: show how technical detections support Irish/EU obligations (NIS2, DORA) and ISO 27001:2022.
+# NOTE: indicative mapping for portfolio/education purposes, not legal advice.
+common:
+  nis2: ["Art. 21(2)(b) - incident handling"]
+  dora: ["Art. 10 - detection of anomalous activities", "Art. 17 - ICT-related incident management process"]
+  iso27001_2022: ["A.8.15 Logging", "A.8.16 Monitoring activities", "A.5.25 Assessment and decision on information security events"]
+by_tactic:
+  execution:            {iso27001_2022: ["A.8.7 Protection against malware"]}
+  defense_evasion:      {iso27001_2022: ["A.8.7 Protection against malware", "A.8.15 Logging"]}
+  credential_access:    {iso27001_2022: ["A.8.5 Secure authentication", "A.8.2 Privileged access rights"]}
+  persistence:          {iso27001_2022: ["A.8.2 Privileged access rights", "A.8.9 Configuration management"]}
+  privilege_escalation: {iso27001_2022: ["A.8.2 Privileged access rights"]}
+  initial_access:       {iso27001_2022: ["A.6.3 Awareness, education and training", "A.8.23 Web filtering"]}
+  command_and_control:  {iso27001_2022: ["A.8.20 Network security", "A.8.23 Web filtering"]}
+  impact:               {iso27001_2022: ["A.8.13 Information backup", "A.5.30 ICT readiness for business continuity"]}

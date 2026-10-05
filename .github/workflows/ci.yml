@@ -1,0 +1,21 @@
+name: detection-ci
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - name: Lint rules (quality gate)
+        run: python -m detectforge validate
+      - name: Unit-test rules (true positives + benign corpus)
+        run: python -m detectforge test && pytest -q
+      - name: Build coverage, compliance and SIEM content
+        run: |
+          python -m detectforge coverage
+          python -m detectforge compliance
+          python -m detectforge convert
+      - uses: actions/upload-artifact@v4
+        with: { name: detection-content, path: out/ }

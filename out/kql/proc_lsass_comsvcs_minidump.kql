@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where CommandLine contains "comsvcs" and CommandLine contains "MiniDump"

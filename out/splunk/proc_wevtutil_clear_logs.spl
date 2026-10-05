@@ -1,0 +1,1 @@
+Image="*\\wevtutil.exe" CommandLine IN ("* cl *", "* clear-log *")

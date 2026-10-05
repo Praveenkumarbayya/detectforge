@@ -1,0 +1,1 @@
+CommandLine IN ("*/dev/tcp/*", "*/dev/udp/*") CommandLine IN ("*bash -i*", "*sh -i*")

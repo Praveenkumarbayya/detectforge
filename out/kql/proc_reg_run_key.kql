@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where Image endswith "\\reg.exe" and CommandLine contains "add" and (CommandLine contains "\\CurrentVersion\\Run" or CommandLine contains "\\CurrentVersion\\RunOnce")

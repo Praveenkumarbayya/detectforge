@@ -1,0 +1,28 @@
+title: Registry Run Key Persistence via reg.exe
+id: eeed27be-6c9a-4e1c-b615-a5438c30f40d
+status: test
+description: A new value written to a Run/RunOnce autostart key using reg.exe.
+references:
+- https://attack.mitre.org/techniques/T1547/001/
+author: Praveen
+date: '2026-09-19'
+tags:
+- attack.persistence
+- attack.privilege_escalation
+- attack.t1547.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_img:
+    Image|endswith: \reg.exe
+  sel_add:
+    CommandLine|contains: add
+  sel_key:
+    CommandLine|contains:
+    - \CurrentVersion\Run
+    - \CurrentVersion\RunOnce
+  condition: sel_img and sel_add and sel_key
+falsepositives:
+- Installers / IT scripts that register autostart entries
+level: medium

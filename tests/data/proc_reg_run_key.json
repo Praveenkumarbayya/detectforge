@@ -1,0 +1,14 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "reg add HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run /v Upd /d C:\\Users\\Public\\a.exe"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "reg query HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+    }
+  ]
+}

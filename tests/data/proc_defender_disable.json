@@ -1,0 +1,14 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell Set-MpPreference -DisableRealtimeMonitoring $true"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell Get-MpComputerStatus"
+    }
+  ]
+}

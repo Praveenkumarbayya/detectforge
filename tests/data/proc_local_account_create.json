@@ -1,0 +1,14 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "CommandLine": "net user support$ P@ssw0rd! /add"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "CommandLine": "net user administrator"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+id: 61a423ab-3db3-46ac-a8d8-a389ec9a4687
+name: Office Application Spawning Script Interpreter or Shell
+description: Word/Excel/PowerPoint/Outlook spawning cmd, PowerShell or script hosts - typical of macro-based phishing.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- InitialAccess
+- Execution
+relevantTechniques:
+- T1566
+- T1204
+query: |
+  SysmonProcessCreate
+  | where (ParentImage endswith "\\winword.exe" or ParentImage endswith "\\excel.exe" or ParentImage endswith "\\powerpnt.exe" or ParentImage endswith "\\outlook.exe") and (Image endswith "\\cmd.exe" or Image endswith "\\powershell.exe" or Image endswith "\\wscript.exe" or Image endswith "\\cscript.exe" or Image endswith "\\mshta.exe")
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

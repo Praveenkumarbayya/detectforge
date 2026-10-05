@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where Image endswith "\\wevtutil.exe" and (CommandLine contains " cl " or CommandLine contains " clear-log ")

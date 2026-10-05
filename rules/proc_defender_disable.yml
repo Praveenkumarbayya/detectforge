@@ -1,0 +1,28 @@
+title: Microsoft Defender Real-Time Protection Disabled
+id: 6cd06e25-7967-483a-b2e6-178d4af42c0e
+status: test
+description: Set-MpPreference used to disable Defender protections or add broad exclusions.
+references:
+- https://attack.mitre.org/techniques/T1562/001/
+author: Praveen
+date: '2026-09-19'
+tags:
+- attack.defense_evasion
+- attack.t1562.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_img:
+    Image|endswith:
+    - \powershell.exe
+    - \pwsh.exe
+  sel_disable:
+    CommandLine|contains:
+    - DisableRealtimeMonitoring $true
+    - DisableRealtimeMonitoring 1
+    - -ExclusionPath
+  condition: sel_img and sel_disable
+falsepositives:
+- Approved AV exclusions from endpoint team (validate via change ticket)
+level: high

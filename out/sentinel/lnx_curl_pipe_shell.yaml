@@ -1,0 +1,30 @@
+id: 8c066224-485d-4764-b348-f4edc44bd34a
+name: Linux Download-and-Execute via curl/wget Piped to Shell
+description: Remote script piped directly into a shell interpreter - common in cryptominer and botnet droppers.
+severity: Medium
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- CommandAndControl
+- Execution
+relevantTechniques:
+- T1105
+- T1059
+query: |
+  SysmonProcessCreate
+  | where (CommandLine contains "curl " or CommandLine contains "wget ") and CommandLine matches regex "\\|\\s*(sudo\\s+)?(ba)?sh(\\s|$)"
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

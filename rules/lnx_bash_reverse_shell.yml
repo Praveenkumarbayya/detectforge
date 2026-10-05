@@ -1,0 +1,27 @@
+title: Linux Bash Reverse Shell
+id: 09537a42-6270-4377-bec2-1aa827f68782
+status: test
+description: Bash interactive shell redirected to a TCP socket via /dev/tcp.
+references:
+- https://attack.mitre.org/techniques/T1059/004/
+author: Praveen
+date: '2026-09-19'
+tags:
+- attack.execution
+- attack.t1059.004
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  sel:
+    CommandLine|contains:
+    - /dev/tcp/
+    - /dev/udp/
+  sel_shell:
+    CommandLine|contains:
+    - bash -i
+    - sh -i
+  condition: sel and sel_shell
+falsepositives:
+- None expected in normal operations
+level: critical

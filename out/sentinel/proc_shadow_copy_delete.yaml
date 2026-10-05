@@ -1,0 +1,28 @@
+id: 4e1530ac-5a67-4bb0-b69e-0d65e80bf5e1
+name: Shadow Copy / Backup Deletion (Ransomware Precursor)
+description: Deletion of volume shadow copies or backup catalogs, or disabling recovery, right before encryption.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- Impact
+relevantTechniques:
+- T1490
+query: |
+  SysmonProcessCreate
+  | where (CommandLine contains "vssadmin" and CommandLine contains "delete" and CommandLine contains "shadows") or (CommandLine contains "shadowcopy" and CommandLine contains "delete") or (CommandLine contains "bcdedit" and CommandLine contains "recoveryenabled" and CommandLine contains "no") or (CommandLine contains "wbadmin" and CommandLine contains "delete" and CommandLine contains "catalog")
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

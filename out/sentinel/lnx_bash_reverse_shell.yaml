@@ -1,0 +1,28 @@
+id: 09537a42-6270-4377-bec2-1aa827f68782
+name: Linux Bash Reverse Shell
+description: Bash interactive shell redirected to a TCP socket via /dev/tcp.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- Execution
+relevantTechniques:
+- T1059
+query: |
+  SysmonProcessCreate
+  | where (CommandLine contains "/dev/tcp/" or CommandLine contains "/dev/udp/") and (CommandLine contains "bash -i" or CommandLine contains "sh -i")
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

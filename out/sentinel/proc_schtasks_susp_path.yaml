@@ -1,0 +1,29 @@
+id: cc53268d-ede3-4d49-8cea-c6b1d00ed34d
+name: Scheduled Task Created Pointing to User-Writable Path
+description: Persistence via schtasks /create where the task runs a binary/script from Temp, AppData, ProgramData or Public.
+severity: Medium
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- Persistence
+- Execution
+relevantTechniques:
+- T1053
+query: |
+  SysmonProcessCreate
+  | where Image endswith "\\schtasks.exe" and CommandLine contains "/create" and (CommandLine contains "\\AppData\\" or CommandLine contains "\\Temp\\" or CommandLine contains "\\ProgramData\\" or CommandLine contains "\\Users\\Public\\")
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

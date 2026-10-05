@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where (CommandLine contains "curl " or CommandLine contains "wget ") and CommandLine matches regex "\\|\\s*(sudo\\s+)?(ba)?sh(\\s|$)"

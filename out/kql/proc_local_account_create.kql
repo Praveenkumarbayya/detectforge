@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where (Image endswith "\\net.exe" or Image endswith "\\net1.exe") and (CommandLine contains "user" and CommandLine contains " /add")

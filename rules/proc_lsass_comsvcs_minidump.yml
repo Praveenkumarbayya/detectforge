@@ -1,0 +1,23 @@
+title: LSASS Memory Dump via comsvcs.dll MiniDump
+id: f1aefd9b-cf8f-4388-9ecf-8aca06b70733
+status: test
+description: Credential dumping using rundll32 + comsvcs.dll MiniDump against the LSASS process.
+references:
+- https://attack.mitre.org/techniques/T1003/001/
+author: Praveen
+date: '2026-09-19'
+tags:
+- attack.credential_access
+- attack.t1003.001
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel:
+    CommandLine|contains|all:
+    - comsvcs
+    - MiniDump
+  condition: sel
+falsepositives:
+- Rare; some EDR/forensic tooling - allow-list by signed parent
+level: critical

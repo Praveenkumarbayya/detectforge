@@ -1,0 +1,27 @@
+title: Linux Download-and-Execute via curl/wget Piped to Shell
+id: 8c066224-485d-4764-b348-f4edc44bd34a
+status: test
+description: Remote script piped directly into a shell interpreter - common in cryptominer and botnet droppers.
+references:
+- https://attack.mitre.org/techniques/T1105/
+author: Praveen
+date: '2026-09-19'
+tags:
+- attack.command_and_control
+- attack.t1105
+- attack.execution
+- attack.t1059.004
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  sel_dl:
+    CommandLine|contains:
+    - 'curl '
+    - 'wget '
+  sel_pipe:
+    CommandLine|re: \|\s*(sudo\s+)?(ba)?sh(\s|$)
+  condition: sel_dl and sel_pipe
+falsepositives:
+- Installer one-liners for well-known tools (e.g. package managers) - allow-list domains
+level: medium

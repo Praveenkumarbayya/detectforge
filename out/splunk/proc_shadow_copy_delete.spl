@@ -1,0 +1,1 @@
+(CommandLine="*vssadmin*" CommandLine="*delete*" CommandLine="*shadows*") OR (CommandLine="*shadowcopy*" CommandLine="*delete*") OR (CommandLine="*bcdedit*" CommandLine="*recoveryenabled*" CommandLine="*no*") OR (CommandLine="*wbadmin*" CommandLine="*delete*" CommandLine="*catalog*")

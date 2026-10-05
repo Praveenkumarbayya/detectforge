@@ -1,0 +1,1 @@
+Image="*\\reg.exe" CommandLine="*add*" CommandLine IN ("*\\CurrentVersion\\Run*", "*\\CurrentVersion\\RunOnce*")

