@@ -7,6 +7,14 @@
     {
       "Image": "C:\\Windows\\System32\\cmd.exe",
       "CommandLine": "cmd /c copy C:\\Users\\Public\\p.exe \\\\WS-007\\C$\\Windows\\Temp\\p.exe"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\cmd.exe",
+      "CommandLine": "\"C:\\WINDOWS\\system32\\cmd.exe\" /c copy C:\\Windows\\win.ini \\127.0.0.1\\C$\\Windows\\Temp\\detectforge_sim.ini",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ParentCommandLine": "\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" ",
+      "User": "LAB\\user",
+      "OriginalFileName": "Cmd.Exe"
     }
   ],
   "should_not_match": [

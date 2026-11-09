@@ -1,87 +1,76 @@
 <#
 .SYNOPSIS
-  Start the DetectForge VirtualBox lab and confirm Splunk Web is reachable.
+  Start the DetectForge home lab and confirm Splunk is reachable from WIN-LAB.
 
 .DESCRIPTION
-  WIN-LAB (Windows 11 + Sysmon, Atomic Red Team) and UBU-SPLUNK (Splunk Enterprise) share the
-  VirtualBox NAT network "LabNet" (10.0.2.0/24). If UBU-SPLUNK is powered off, Splunk Web won't
-  open inside WIN-LAB. This script:
-    1. pins UBU-SPLUNK to 10.0.2.4 with a fixed DHCP lease (so the URL never moves),
-    2. makes sure the host port-forward 8000 -> 10.0.2.4:8000 exists,
-    3. starts any lab VM that is off (headless),
-    4. waits until Splunk Web answers, then prints the URLs to use.
+  Lab layout (see README "Home lab"):
+    * Splunk Enterprise runs in Docker Desktop on the host (container "splunk"),
+      publishing 8000 (web), 8088 (HEC), 8089 (mgmt), 9997 (forwarder input).
+    * WIN-LAB (VirtualBox, Windows 11 + Sysmon + Splunk Universal Forwarder) reaches the
+      host on the VirtualBox host-only network at 192.168.56.1.
+    * UBU-SPLUNK (old Splunk VM) is retired - this script never starts it.
+
+  Steps: start Docker Desktop if needed -> start the splunk container -> wait until it is
+  healthy and Splunk Web answers -> start WIN-LAB -> print the URLs.
 
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1
-  powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1 -Stop   # save state of both VMs
+  powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1 -Stop   # save WIN-LAB, stop container
 #>
 param(
   [switch]$Stop,
-  [int]$TimeoutSec = 300
+  [int]$TimeoutSec = 420
 )
 
 $ErrorActionPreference = 'Stop'
-$vb       = "$env:ProgramFiles\Oracle\VirtualBox\VBoxManage.exe"
-$net      = 'LabNet'
-$splunkVm = 'UBU-SPLUNK'
-$winVm    = 'WIN-LAB'
-$splunkIp = '10.0.2.4'
-$splunkMac = '0800270AEADF'   # UBU-SPLUNK NIC 1
-
-if (-not (Test-Path $vb)) { throw "VirtualBox not found at $vb" }
+$vb        = "$env:ProgramFiles\Oracle\VirtualBox\VBoxManage.exe"
+$winVm     = 'WIN-LAB'
+$container = 'splunk'
+$hostOnly  = '192.168.56.1'
 
 function Get-VmState($name) {
   (& $vb showvminfo $name --machinereadable | Select-String '^VMState=').Line -replace '^VMState="(.*)"$', '$1'
 }
+function Test-Docker { & docker info --format '{{.ServerVersion}}' 2>$null | Out-Null; $LASTEXITCODE -eq 0 }
 
 if ($Stop) {
-  foreach ($vm in $winVm, $splunkVm) {
-    if ((Get-VmState $vm) -eq 'running') { Write-Host "Saving state of $vm..."; & $vb controlvm $vm savestate | Out-Null }
-  }
+  if ((Get-VmState $winVm) -eq 'running') { Write-Host "Saving state of $winVm..."; & $vb controlvm $winVm savestate | Out-Null }
+  if (Test-Docker) { Write-Host "Stopping container $container..."; & docker stop $container | Out-Null }
   return
 }
 
-# 1. Fixed DHCP lease for the Splunk server (idempotent).
-$cfg = (& $vb list dhcpservers) -join "`n"
-if ($cfg -notmatch "(?i)$($splunkMac -replace '(..)(?!$)', '$1:')") {
-  Write-Host "Pinning $splunkVm to $splunkIp on $net"
-  & $vb dhcpserver modify --network $net --mac-address $splunkMac --fixed-address $splunkIp | Out-Null
-}
+$deadline = (Get-Date).AddSeconds($TimeoutSec)
 
-# 2. Host -> Splunk Web forward (so you can also open it from the host browser).
-$nat = (& $vb natnetwork list) -join "`n"
-if ($nat -notmatch 'SplunkWeb:tcp') {
-  Write-Host 'Adding port-forward SplunkWeb host:8000 -> ' "$splunkIp`:8000"
-  & $vb natnetwork modify --netname $net --port-forward-4 "SplunkWeb:tcp:[]:8000:[$splunkIp]:8000" | Out-Null
-}
-
-# 3. Start VMs (Splunk first so it is ready by the time Windows logs in).
-foreach ($vm in $splunkVm, $winVm) {
-  $state = Get-VmState $vm
-  if ($state -ne 'running') {
-    $type = if ($vm -eq $winVm) { 'gui' } else { 'headless' }
-    Write-Host "Starting $vm ($state -> $type)"
-    & $vb startvm $vm --type $type | Out-Null
-  } else {
-    Write-Host "$vm already running"
+# 1. Docker Desktop
+if (-not (Test-Docker)) {
+  Write-Host 'Starting Docker Desktop...'
+  Start-Process "$env:ProgramFiles\Docker\Docker\Docker Desktop.exe"
+  while (-not (Test-Docker)) {
+    if ((Get-Date) -gt $deadline) { throw 'Docker Desktop did not start in time.' }
+    Start-Sleep -Seconds 5
   }
 }
 
-# 4. Wait for Splunk Web.
-$url = 'http://127.0.0.1:8000/en-US/account/login'
-$deadline = (Get-Date).AddSeconds($TimeoutSec)
-Write-Host -NoNewline 'Waiting for Splunk Web'
-while ((Get-Date) -lt $deadline) {
-  try {
-    $r = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 5
-    if ($r.StatusCode -eq 200) {
-      Write-Host "`nSplunk Web is up."
-      Write-Host "  From the host:        http://127.0.0.1:8000"
-      Write-Host "  From inside WIN-LAB:  http://192.168.56.1:8000   (http, not https - https gets 'connection reset')"
-      return
-    }
-  } catch { Write-Host -NoNewline '.'; Start-Sleep -Seconds 5 }
+# 2. Splunk container
+$state = (& docker inspect -f '{{.State.Status}}' $container 2>$null)
+if ($state -ne 'running') { Write-Host "Starting container $container ($state)"; & docker start $container | Out-Null }
+
+# 3. Wait for healthy + Splunk Web
+Write-Host -NoNewline 'Waiting for Splunk'
+while ($true) {
+  $health = (& docker inspect -f '{{.State.Health.Status}}' $container 2>$null)
+  $web = try { (Invoke-WebRequest "http://${hostOnly}:8000/en-US/account/login" -UseBasicParsing -TimeoutSec 5).StatusCode } catch { 0 }
+  if ($health -eq 'healthy' -and $web -eq 200) { Write-Host " ready."; break }
+  if ((Get-Date) -gt $deadline) { Write-Host ''; throw "Splunk not ready (health=$health, web=$web). Try: docker logs --tail 50 $container" }
+  Write-Host -NoNewline '.'; Start-Sleep -Seconds 5
 }
-Write-Warning "Splunk Web did not answer within $TimeoutSec s. Log in to $splunkVm and run:"
-Write-Warning "  sudo /opt/splunk/bin/splunk status ; sudo /opt/splunk/bin/splunk enable boot-start -systemd-managed 1"
-exit 1
+
+# 4. WIN-LAB
+if ((Get-VmState $winVm) -ne 'running') { Write-Host "Starting $winVm"; & $vb startvm $winVm --type gui | Out-Null }
+else { Write-Host "$winVm already running" }
+
+Write-Host ''
+Write-Host 'Splunk Web (use http, NOT https - https gives "connection reset" / curl error 35):'
+Write-Host "  inside WIN-LAB : http://${hostOnly}:8000"
+Write-Host '  on the host    : http://127.0.0.1:8000'
+Write-Host "Forwarder target : ${hostOnly}:9997  (indexes: sysmon, wineventlog)"

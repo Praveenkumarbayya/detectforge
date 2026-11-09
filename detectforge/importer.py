@@ -9,6 +9,15 @@ from pathlib import Path
 
 KEEP = ["Image", "CommandLine", "ParentImage", "ParentCommandLine", "User", "Computer", "OriginalFileName"]
 
+# Shared profile folders are not personal data, and rules key on them (e.g. C:\Users\Public is a classic
+# staging path), so they must survive pseudonymisation unchanged.
+_SHARED_PROFILES = r"(?:Public|Default|Default User|All Users)"
+_USER_DIR = re.compile(rf"C:\\Users\\(?!{_SHARED_PROFILES}(?:\\|\b))[^\\\s\"']+", re.I)
+
+
+def _scrub_profile(s: str) -> str:
+    return _USER_DIR.sub(r"C:\\Users\\user", s)
+
 
 def read_events(path: str | Path) -> list[dict]:
     text = Path(path).read_text(encoding="utf-8-sig").strip()
@@ -38,10 +47,10 @@ def sanitise(events: list[dict], extra_users: list[str] | None = None) -> list[d
             if k in n:
                 for u in extra_users or []:
                     n[k] = re.sub(re.escape(u), "user", n[k], flags=re.I)
-                n[k] = re.sub(r"C:\\Users\\[^\\]+", r"C:\\Users\\user", n[k], flags=re.I)
+                n[k] = _scrub_profile(n[k])
         for k in ("Image", "ParentImage"):
             if k in n:
-                n[k] = re.sub(r"C:\\Users\\[^\\]+", r"C:\\Users\\user", n[k], flags=re.I)
+                n[k] = _scrub_profile(n[k])
         out.append(n)
     return out
 

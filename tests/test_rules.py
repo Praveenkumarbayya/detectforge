@@ -44,3 +44,12 @@ def test_importer_sanitises_and_appends(tmp_path):
     assert ev == [{"Image": "C:\\Users\\user\\x.exe", "CommandLine": "x.exe user", "User": "LAB\\user", "Computer": "WS-001"}]
     p = importer.add_to_tests("demo", ev, "should_match", tmp_path)
     assert json.loads(p.read_text())["should_match"] == ev
+
+def test_importer_keeps_shared_profile_paths():
+    # Regression: real lab telemetry. C:\Users\Public is not personal data and rules depend on it.
+    from detectforge import importer
+    ev = importer.sanitise([{
+        "Image": "C:\\Windows\\System32\\rundll32.exe",
+        "CommandLine": "\"C:\\WINDOWS\\system32\\rundll32.exe\" C:\\Users\\Public\\x.dll,Run C:\\Users\\alice\\AppData\\y.dll",
+    }])
+    assert ev[0]["CommandLine"] == "\"C:\\WINDOWS\\system32\\rundll32.exe\" C:\\Users\\Public\\x.dll,Run C:\\Users\\user\\AppData\\y.dll"

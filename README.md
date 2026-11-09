@@ -3,7 +3,7 @@
 > Write detections like software: **Sigma rules → automated tests → CI → SIEM-ready content → ATT&CK coverage → compliance traceability.**
 > Built by a computing graduate (SC-200, ISO 27001 Lead Auditor) to show the full detection-engineering lifecycle, not just "I installed a SIEM".
 
-![CI](https://img.shields.io/badge/CI-GitHub_Actions-blue) ![Rules](https://img.shields.io/badge/rules-18-green) ![ATT%26CK](https://img.shields.io/badge/ATT%26CK-21_techniques-red) ![Tests](https://img.shields.io/badge/tests-41_passing-brightgreen)
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-blue) ![Rules](https://img.shields.io/badge/rules-18-green) ![ATT%26CK](https://img.shields.io/badge/ATT%26CK-21_techniques-red) ![Tests](https://img.shields.io/badge/tests-42_passing-brightgreen)
 
 ## Why this exists
 
@@ -50,7 +50,7 @@ python -m detectforge coverage     # out/COVERAGE.md + out/attack_layer.json (lo
 python -m detectforge convert      # out/splunk, out/kql, out/sentinel
 python -m detectforge compliance   # out/TRACEABILITY.md
 python -m detectforge hunt data/scenarios/ransomware_chain.jsonl
-pytest -q                          # 41 tests
+pytest -q                          # 42 tests
 ```
 
 ### Demo output (`hunt`)
@@ -73,24 +73,41 @@ shadow-copy deletion → log clearing, plus rundll32 proxy execution, WMI proces
 lateral movement, NTDS.dit theft, and Linux reverse-shell and curl|bash droppers. Each rule documents **false positives**
 and maps to MITRE ATT&CK. See `out/COVERAGE.md` for the current gap list (currently 21/28 priority techniques, 75%).
 
-## Home lab (VirtualBox)
+## Home lab
 
-| VM | Role | Address on `LabNet` (10.0.2.0/24) |
+| Component | Where | Role |
 |---|---|---|
-| `WIN-LAB` | Windows 11 + Sysmon, Atomic Red Team target | DHCP (10.0.2.3) |
-| `UBU-SPLUNK` | Splunk Enterprise (Splunk Web, HTTP) | **10.0.2.4** (fixed DHCP lease) |
+| Splunk Enterprise | Docker Desktop on the host, container `splunk` | SIEM: web `8000`, HEC `8088`, mgmt `8089`, forwarder input `9997` |
+| `WIN-LAB` | VirtualBox, Windows 11 | Sysmon64 + Splunk Universal Forwarder, Atomic Red Team target |
+| Host-only network | `192.168.56.0/24`, host = `192.168.56.1` | How WIN-LAB reaches Splunk on the host |
 
-Start everything with one command. It pins the Splunk IP, starts any VM that's off, and waits until Splunk Web answers:
+Forwarder (WIN-LAB) sends to `192.168.56.1:9997`: Sysmon/Operational → index `sysmon`, Security + System →
+index `wineventlog`. The indexes are defined in the `detectforge_lab` app inside the container.
+(`UBU-SPLUNK`, the original Splunk VM, is retired.)
+
+Start everything with one command. It starts Docker Desktop and the container, waits until Splunk is healthy,
+then boots WIN-LAB:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1         # start lab
-powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1 -Stop   # save state
+powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1 -Stop   # save WIN-LAB, stop Splunk
 ```
 
-Inside WIN-LAB, open **http://192.168.56.1:8000**. That's the host's host-only address, forwarded to Splunk on 10.0.2.4.
-From the host, use http://127.0.0.1:8000. Splunk Web here is plain **HTTP**: `https://` gets "connection reset"
-(curl error 35). If Splunk "won't open" in WIN-LAB, check those two things first: use `http://`, and make sure
-`UBU-SPLUNK` is powered on (run the script).
+Inside WIN-LAB, open **http://192.168.56.1:8000**. From the host, use http://127.0.0.1:8000.
+
+**Troubleshooting notes (learned the hard way):**
+* Splunk Web here is plain **HTTP**. `https://` gets "connection reset" / curl error 35 even though
+  `Test-NetConnection` succeeds: the TCP port is fine, but TLS isn't spoken.
+* `netstat`/`Get-NetTCPConnection` on the host shows Docker's listeners appearing and disappearing. That's
+  a reporting quirk of Docker Desktop's relay; actual connections still work. Test with `curl`, not `netstat`.
+* `.wslconfig` must be named exactly that. Notepad saving it as `.wslconfig.txt` silently ignores it.
+* After moving Splunk, update the forwarder's `outputs.conf` too. The old one still pointed at the retired VM,
+  so nothing was indexed. Versioned forwarder config lives in `lab/forwarder/`; the Splunk-side app (indexes +
+  Sysmon field extraction) lives in `lab/splunk/` and is deployed with `lab\deploy-splunk-app.ps1`.
+* Security/System logs arrive but **Sysmon doesn't**? The forwarder's splunkd.log shows
+  `unable to subscribe to ... Microsoft-Windows-Sysmon/Operational: errorCode=5` (access denied). Recent forwarders
+  run as the low-privilege `NT SERVICE\SplunkForwarder` account. Grant it read access, as admin in WIN-LAB:
+  `Add-LocalGroupMember -Group 'Event Log Readers' -Member 'NT SERVICE\SplunkForwarder'; Restart-Service SplunkForwarder`
 
 ## Writing a new detection (the workflow)
 

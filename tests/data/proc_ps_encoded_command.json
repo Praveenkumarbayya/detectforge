@@ -4,6 +4,14 @@
       "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "CommandLine": "powershell.exe -NoP -W Hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQA",
       "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "\"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoProfile -EncodedCommand VwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIABkAGUAdABlAGMAdABmAG8AcgBnAGUALQBzAGkAbQA=",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ParentCommandLine": "\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" ",
+      "User": "LAB\\user",
+      "OriginalFileName": "PowerShell.EXE"
     }
   ],
   "should_not_match": [

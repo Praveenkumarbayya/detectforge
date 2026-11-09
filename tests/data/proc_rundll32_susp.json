@@ -11,6 +11,14 @@
     {
       "Image": "C:\\Windows\\SysWOW64\\rundll32.exe",
       "CommandLine": "rundll32.exe C:\\Users\\user\\AppData\\Local\\Temp\\a.dll,Start"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\rundll32.exe",
+      "CommandLine": "\"C:\\WINDOWS\\system32\\rundll32.exe\" C:\\Users\\Public\\detectforge_sim.dll,DllRegisterServer",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ParentCommandLine": "\"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" ",
+      "User": "LAB\\user",
+      "OriginalFileName": "RUNDLL32.EXE"
     }
   ],
   "should_not_match": [
