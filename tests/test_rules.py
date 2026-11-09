@@ -56,6 +56,24 @@ def test_splunk_alerts_cover_every_windows_rule():
             assert line.startswith("search = index=sysmon EventCode=1 ")
     assert "dispatch.index_earliest = -5m@m" in conf and "alert.track = 1" in conf
 
+def test_native_detections_pass_lint_and_compile():
+    from detectforge import native, convert
+    nat = native.load_native("detections_native")
+    assert nat, "expected at least one native detection"
+    for d in nat:
+        assert native.lint(d) == [], d["_stem"]
+    conf, _ = convert.to_splunk_savedsearches([], nat)
+    bf = conf.split("[DetectForge - Windows Brute Force")[1]
+    assert "where failures >= 10 OR distinct_users >= 5" in bf          # thresholds substituted
+    assert "alert.suppress.fields = host,src_ip" in bf and "alert.digest_mode = 0" in bf
+
+def test_native_lint_catches_bad_threshold():
+    from detectforge import native
+    d = {"title": "x", "id": "925dfa64-6a35-4a6e-88ea-e958a77df4c3", "kind": "splunk_native", "description": "x",
+         "level": "low", "tags": ["attack.t1110"], "falsepositives": ["x"], "schedule": {"cron": "* * * * *"},
+         "search": "index=x | where c > {missing}"}
+    assert any("undefined threshold" in e for e in native.lint(d))
+
 def test_importer_keeps_shared_profile_paths():
     # Regression: real lab telemetry. C:\Users\Public is not personal data and rules depend on it.
     from detectforge import importer

@@ -3,7 +3,7 @@
 > Write detections like software: **Sigma rules → automated tests → CI → SIEM-ready content → ATT&CK coverage → compliance traceability.**
 > Built by a computing graduate (SC-200, ISO 27001 Lead Auditor) to show the full detection-engineering lifecycle, not just "I installed a SIEM".
 
-![CI](https://img.shields.io/badge/CI-GitHub_Actions-blue) ![Rules](https://img.shields.io/badge/rules-18-green) ![ATT%26CK](https://img.shields.io/badge/ATT%26CK-21_techniques-red) ![Tests](https://img.shields.io/badge/tests-43_passing-brightgreen)
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-blue) ![Detections](https://img.shields.io/badge/detections-19-green) ![ATT%26CK](https://img.shields.io/badge/ATT%26CK-23_techniques-red) ![Tests](https://img.shields.io/badge/tests-45_passing-brightgreen) ![Lab](https://img.shields.io/badge/lab-live_Splunk_alerts-orange)
 
 ## Why this exists
 
@@ -18,6 +18,7 @@ detection and incident-handling capability. DetectForge tackles all four problem
 | "What can we actually detect?" | Generates an **ATT&CK Navigator layer** + gap report vs a priority technique list |
 | Vendor lock-in | Vendor-neutral **Sigma** compiled to **Splunk SPL**, **Sentinel KQL** and **Sentinel analytics-rule YAML** |
 | Isolated alerts, no story | **Correlation engine** groups alerts per host into a kill-chain **incident** with a risk score |
+| "Works on my laptop" detections | Rules are **deployed as scheduled Splunk alerts** in a home lab and proven against **real Sysmon telemetry** |
 | SOC ↔ GRC disconnect | **Traceability matrix**: each detection → NIS2 / DORA / ISO 27001:2022 controls |
 
 ## Architecture
@@ -68,12 +69,18 @@ kill chain: initial_access -> execution -> persistence -> defense_evasion -> cre
   >> RECOMMENDED: isolate host, reset user creds, preserve memory image, start IR runbook
 ```
 
-## Detection library (18 rules)
+## Detection library (18 Sigma rules + 1 native)
 
 Phishing macro → encoded PowerShell → certutil download → scheduled-task persistence → LSASS dump → Defender tamper →
 shadow-copy deletion → log clearing, plus rundll32 proxy execution, WMI process creation, RDP enabling, admin-share
 lateral movement, NTDS.dit theft, and Linux reverse-shell and curl|bash droppers. Each rule documents **false positives**
-and maps to MITRE ATT&CK. See `out/COVERAGE.md` for the current gap list (currently 21/28 priority techniques, 75%).
+and maps to MITRE ATT&CK. See `out/COVERAGE.md` for the current gap list (currently 22/28 priority techniques, 78%).
+
+**Native detections** (`detections_native/`): some logic can't be a single-event Sigma rule. The
+**brute-force / password-spray** detection (T1110.001 / T1110.003) counts failed logons (EID 4625) per source over
+15 minutes, so it's written as native Splunk SPL. It carries the same metadata as a Sigma rule (id, ATT&CK tags,
+level, false positives) and is linted by `validate`. It also counts towards coverage and compliance, and deploys as
+an alert like every other rule. It is *not* run by the offline evaluator; it's validated live in the lab instead.
 
 ## Home lab
 
@@ -111,6 +118,23 @@ Inside WIN-LAB, open **http://192.168.56.1:8000**. From the host, use http://127
   run as the low-privilege `NT SERVICE\SplunkForwarder` account. Grant it read access, as admin in WIN-LAB:
   `Add-LocalGroupMember -Group 'Event Log Readers' -Member 'NT SERVICE\SplunkForwarder'; Restart-Service SplunkForwarder`
 
+### Lab evidence (real telemetry, not samples)
+
+Benign simulations run in WIN-LAB (commands in [`lab/VALIDATION.md`](lab/VALIDATION.md)), detected end to end:
+Sysmon → Universal Forwarder → Splunk → DetectForge scheduled alert.
+
+| Simulation in WIN-LAB | Detection that fired | Technique |
+|---|---|---|
+| `powershell -EncodedCommand …` | Suspicious Encoded PowerShell Command | T1059.001, T1027 |
+| `Invoke-CimMethod Win32_Process Create` | WMI Used to Launch a Process | T1047 |
+| `rundll32 C:\Users\Public\x.dll,…` | Rundll32 Proxy Execution | T1218.011 |
+| `copy … \\127.0.0.1\C$\…` | Admin Share Used for Remote Copy | T1021.002 |
+| 12 bad-password SMB logons across 6 fake accounts | Brute Force / Password Spray (native) | T1110.003 |
+
+Each simulated technique raised exactly one alert of the matching rule. No other DetectForge alert fired on normal
+WIN-LAB activity during the run. The real Sysmon events for the first four were sanitised and added to
+`tests/data/`, so CI now regression-tests the rules against genuine telemetry as well as hand-written samples.
+
 ## Writing a new detection (the workflow)
 
 1. Copy a file in `rules/`, change the logic, tags, `falsepositives`.
@@ -121,15 +145,16 @@ Inside WIN-LAB, open **http://192.168.56.1:8000**. From the host, use http://127
 
 ## Design decisions & limitations (read this — it's honest)
 
-* **The offline evaluator supports a Sigma subset** (field modifiers, wildcards, and/or/not, `1 of`/`all of`). Aggregations (`count`, `near`) raise `NotImplementedError` instead of silently passing.
-* **Sample telemetry is synthetic** (hand-written, modelled on Sysmon EID 1 / process creation). Real-world FP rates need real data — the Atomic Red Team lab validates true positives; production tuning needs your own logs.
+* **The offline evaluator supports a Sigma subset** (field modifiers, wildcards, and/or/not, `1 of`/`all of`). Aggregations (`count`, `near`) raise `NotImplementedError` instead of silently passing. Aggregation logic lives in `detections_native/` and is validated live in the lab instead.
+* **Test telemetry is mostly hand-written** (modelled on Sysmon EID 1), plus real sanitised Sysmon events from the lab for the rules validated there. A single lab host is not production: real false-positive rates need real enterprise logs.
+* **Lab simulations are benign stand-ins**, not real attack tooling. They reproduce the command lines the rules key on. The original rules (LSASS dump, shadow-copy deletion, etc.) still need validating with Atomic Red Team.
 * **KQL output assumes a `SysmonProcessCreate` parser function** in your Sentinel workspace (configurable in `convert.py`). Field mapping between Sysmon and ASIM/Defender tables would be done with a pySigma processing pipeline.
 * Compliance mapping is **indicative**, for portfolio/education use, not legal advice.
 * All samples use documentation IP ranges (RFC 5737); no real malware is included.
 
 ## Roadmap
 
-Brute-force / password-spray (aggregation rules), Entra ID sign-in detections, Sigma→Elastic, Atomic Red Team automated purple-team runner, Sentinel deployment via GitHub Action, MISP/OpenCTI IOC enrichment.
+Atomic Red Team validation of the original rules (LSASS, scheduled task, shadow copies), Entra ID sign-in detections, Sigma→Elastic, Sentinel deployment via GitHub Action, MISP/OpenCTI IOC enrichment.
 
 ## License
 MIT

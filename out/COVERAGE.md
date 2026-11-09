@@ -1,14 +1,14 @@
 # Detection Coverage Report
 
-* Rules: **18**  |  Distinct techniques: **21**
-* Priority-technique coverage: **21/28 (75%)**
+* Rules: **19**  |  Distinct techniques: **23**
+* Priority-technique coverage: **22/28 (78%)**
 
 ## Coverage by tactic
 
 | Tactic | Techniques covered |
 |---|---|
 | Command And Control | T1059.004, T1105, T1140 |
-| Credential Access | T1003.001, T1003.003 |
+| Credential Access | T1003.001, T1003.003, T1110.001, T1110.003 |
 | Defense Evasion | T1021.001, T1027, T1059.001, T1070.001, T1105, T1112, T1140, T1218.005, T1218.011, T1562.001 |
 | Execution | T1027, T1047, T1053.005, T1059.001, T1059.004, T1105, T1204.002, T1218.005, T1566.001 |
 | Impact | T1490 |
@@ -23,7 +23,6 @@
 |---|---|---|
 | T1059.003 | Windows Command Shell | https://atomicredteam.io/atomic-red-team/atomics/T1059.003/ |
 | T1078 | Valid Accounts | https://atomicredteam.io/atomic-red-team/atomics/T1078/ |
-| T1110 | Brute Force | https://atomicredteam.io/atomic-red-team/atomics/T1110/ |
 | T1486 | Data Encrypted for Impact | https://atomicredteam.io/atomic-red-team/atomics/T1486/ |
 | T1041 | Exfiltration Over C2 Channel | https://atomicredteam.io/atomic-red-team/atomics/T1041/ |
 | T1071.001 | Web Protocols (C2) | https://atomicredteam.io/atomic-red-team/atomics/T1071.001/ |
@@ -45,6 +44,7 @@
 | Suspicious Encoded PowerShell Command | high | T1059.001, T1027 |
 | Rundll32 Proxy Execution of Script or User-Writable DLL | high | T1218.011 |
 | Windows Event Logs Cleared via wevtutil | high | T1070.001 |
+| Windows Brute Force or Password Spray (Failed Logon Burst) | high | T1110.001, T1110.003 |
 | Linux Download-and-Execute via curl/wget Piped to Shell | medium | T1105, T1059.004 |
 | Admin Share Mounted or Used for Remote Copy | medium | T1021.002 |
 | Remote Desktop Enabled via Registry or Firewall Command | medium | T1021.001, T1112 |

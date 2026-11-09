@@ -72,6 +72,16 @@
       "comment": "Linux Download-and-Execute via curl/wget Piped to Shell; Certutil Used to Download or Decode Payloads"
     },
     {
+      "techniqueID": "T1110.001",
+      "score": 1,
+      "comment": "Windows Brute Force or Password Spray (Failed Logon Burst)"
+    },
+    {
+      "techniqueID": "T1110.003",
+      "score": 1,
+      "comment": "Windows Brute Force or Password Spray (Failed Logon Burst)"
+    },
+    {
       "techniqueID": "T1112",
       "score": 1,
       "comment": "Remote Desktop Enabled via Registry or Firewall Command"

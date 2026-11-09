@@ -36,6 +36,18 @@ index=sysmon EventCode=1 CommandLine="*detectforge_sim*" OR CommandLine="*-Encod
 Fields such as `Image` and `CommandLine` come from the `detectforge_lab` app's search-time extraction
 (`lab/splunk/detectforge_lab/local/transforms.conf`), so the Sysmon add-on from Splunkbase isn't required.
 
+### Password spray (native detection `win_bruteforce_password_spray`)
+
+In a **cmd** window in WIN-LAB, run 12 bad-password SMB logons against WIN-LAB itself, spread over 6 accounts that
+don't exist. No real account is touched or locked:
+
+```bat
+for %u in (dfspray1 dfspray2 dfspray3 dfspray4 dfspray5 dfspray6) do @(net use \\127.0.0.1\IPC$ /user:%u Wr0ngPass1 & net use \\127.0.0.1\IPC$ /user:%u Wr0ngPass2)
+```
+
+Each attempt should fail with *System error 1326* (a Security EID 4625 failed logon). The alert fires on its next
+5-minute run with `pattern = T1110.003 password spraying` (6 distinct accounts ≥ 5).
+
 ## Live alerts
 
 `lab\deploy-splunk-app.ps1` compiles every Windows rule into a scheduled Splunk alert

@@ -2,7 +2,7 @@
 from __future__ import annotations
 import argparse, json, sys
 from pathlib import Path
-from . import loader, evaluator, coverage, convert, compliance, hunt, importer
+from . import loader, evaluator, coverage, convert, compliance, hunt, importer, native
 
 G, R_, Y, X = "\033[32m", "\033[31m", "\033[33m", "\033[0m"
 
@@ -14,7 +14,13 @@ def cmd_validate(a):
         print(f"{R_+'FAIL' if errs else G+'ok  '}{X}  {r['_stem']}")
         for e in errs:
             print(f"        - {e}"); bad += 1
-    print(f"\n{len(rules)} rules checked, {bad} problem(s)")
+    nat = native.load_native(a.native)
+    for d in nat:
+        errs = native.lint(d)
+        print(f"{R_+'FAIL' if errs else G+'ok  '}{X}  {d['_stem']}  (native {d.get('kind')})")
+        for e in errs:
+            print(f"        - {e}"); bad += 1
+    print(f"\n{len(rules)} rules + {len(nat)} native detection(s) checked, {bad} problem(s)")
     return 1 if bad else 0
 
 
@@ -39,21 +45,22 @@ def cmd_test(a):
 
 
 def cmd_coverage(a):
-    rules = loader.load_rules(a.rules)
+    rules = loader.load_rules(a.rules) + native.load_native(a.native)
     coverage.write_all(rules, a.out)
     print(coverage.markdown_report(rules)); print(f"wrote {a.out}/COVERAGE.md and {a.out}/attack_layer.json (open in ATT&CK Navigator)")
 
 
 def cmd_convert(a):
-    n = convert.export_all(loader.load_rules(a.rules), a.out)
+    nat = native.load_native(a.native)
+    n = convert.export_all(loader.load_rules(a.rules), a.out, nat)
     print(f"compiled {n} rules -> {a.out}/splunk, {a.out}/kql, {a.out}/sentinel")
     _, skipped = convert.to_splunk_savedsearches(loader.load_rules(a.rules))
-    print(f"Splunk alerts -> {a.out}/splunk/savedsearches.conf ({n - len(skipped)} rules; "
+    print(f"Splunk alerts -> {a.out}/splunk/savedsearches.conf ({n - len(skipped)} rules + {len(nat)} native; "
           f"skipped, no lab data source: {', '.join(skipped) or 'none'})")
 
 
 def cmd_compliance(a):
-    md = compliance.markdown(loader.load_rules(a.rules))
+    md = compliance.markdown(loader.load_rules(a.rules) + native.load_native(a.native))
     Path(a.out).mkdir(exist_ok=True); Path(a.out, "TRACEABILITY.md").write_text(md); print(md)
 
 
@@ -74,6 +81,7 @@ def cmd_import(a):
 def main(argv=None):
     p = argparse.ArgumentParser(prog="detectforge", description=__doc__)
     p.add_argument("--rules", default="rules"); p.add_argument("--tests", default="tests/data"); p.add_argument("--out", default="out")
+    p.add_argument("--native", default="detections_native", help="native (SIEM-specific) detections dir")
     sp = p.add_subparsers(dest="cmd", required=True)
     for n, f in [("validate", cmd_validate), ("test", cmd_test), ("coverage", cmd_coverage), ("convert", cmd_convert), ("compliance", cmd_compliance)]:
         sp.add_parser(n).set_defaults(fn=f)

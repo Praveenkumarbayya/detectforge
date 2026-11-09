@@ -4,17 +4,18 @@
 
 ## Resume entry (paste under "Projects")
 
-**DetectForge — Detection-as-Code SOC Pipeline** | Python, Sigma, MITRE ATT&CK, Microsoft Sentinel (KQL), Splunk (SPL), GitHub Actions | github.com/<you>/detectforge
+**DetectForge — Detection-as-Code SOC Pipeline** | Python, Sigma, MITRE ATT&CK, Splunk (SPL), Microsoft Sentinel (KQL), Sysmon, Docker, GitHub Actions | github.com/<you>/detectforge
 
-* Engineered a detection-as-code pipeline that compiles **vendor-neutral Sigma rules into Microsoft Sentinel KQL/analytics rules and Splunk SPL**, gated by GitHub Actions CI (lint, unit tests, benign-corpus false-positive regression).
-* Authored and tested **13 ATT&CK-mapped detections** (phishing macro → PowerShell → credential dumping → ransomware precursors) with documented false-positive tuning guidance; **31 automated tests**, zero false positives on a 300-event benign corpus.
+* Engineered a detection-as-code pipeline that compiles **vendor-neutral Sigma rules into Splunk SPL/scheduled alerts and Microsoft Sentinel KQL/analytics rules**, gated by GitHub Actions CI (lint, unit tests, benign-corpus false-positive regression).
+* Authored and tested **19 ATT&CK-mapped detections** (18 Sigma + 1 native SPL aggregation for brute force/password spray) with documented false-positive guidance; **45 automated tests**, zero false positives on a 300-event benign corpus.
+* Built a **home SOC lab** (Windows 11 + Sysmon → Splunk Universal Forwarder → Splunk in Docker) and **deployed the rules as live scheduled alerts**; benign attack simulations triggered exactly the intended alerts, and the real Sysmon events now regression-test the rules in CI.
 * Built an **alert-correlation engine** that clusters alerts per host into kill-chain incidents with risk scoring, reducing 9 raw alerts to 1 prioritised multi-stage incident in a ransomware simulation.
-* Generated **ATT&CK Navigator coverage layers and gap analysis** (53% of a 28-technique priority list) to drive the detection backlog.
+* Generated **ATT&CK Navigator coverage layers and gap analysis** (78% of a 28-technique priority list) to drive the detection backlog.
 * Mapped detections to **NIS2, DORA and ISO 27001:2022** controls, linking SOC telemetry to EU regulatory evidence (ISO 27001 Lead Auditor background).
 
 Shorter 2-line version for a crowded CV:
-* Built DetectForge, a CI-tested detection-as-code pipeline (Sigma → Sentinel KQL / Splunk SPL) with 13 ATT&CK-mapped rules, kill-chain alert correlation and NIS2/DORA/ISO 27001 traceability.
-* Validated detections against Atomic Red Team in a home lab; 31 automated tests, 0 false positives on benign corpus.  *(only keep the lab sentence after you do the lab)*
+* Built DetectForge, a CI-tested detection-as-code pipeline (Sigma → Splunk / Sentinel) with 19 ATT&CK-mapped detections, kill-chain alert correlation and NIS2/DORA/ISO 27001 traceability.
+* Deployed the rules as live Splunk alerts in a Sysmon home lab and validated them against real telemetry; 45 automated tests, 0 false positives on a benign corpus.
 
 ## LinkedIn headline / About line
 "Aspiring SOC / Detection Engineer | SC-200 | ISO 27001 Lead Auditor | Building detection-as-code (Sigma → Sentinel/Splunk) | Dublin | Seeking Critical Skills sponsorship"
@@ -34,11 +35,15 @@ Shorter 2-line version for a crowded CV:
 
 **What are the weaknesses of command-line detections?** Obfuscation, renamed binaries, alternative binaries. Answer: layer behavioural detections (parent/child, LSASS access events, network), and use coverage gaps to prioritise. Mention `-enc` variants and that you'd add decoding logic in enrichment.
 
-**What would you do next?** Aggregation rules for brute force/password spray, Entra ID sign-in detections, an Atomic Red Team automated purple-team runner, deploying rules to Sentinel via GitHub Action, and CTI enrichment (MISP/OpenCTI).
+**Why is the brute-force detection not a Sigma rule?** It needs counting over a time window (failed logons per source in 15 minutes). My Sigma rules and offline evaluator are single-event matchers. I made aggregations fail loudly instead of silently passing, and wrote this one as native SPL with the same metadata (ATT&CK tags, false positives), so coverage and compliance still see it. It's validated live in the lab instead of offline. Thresholds: ≥10 failures (guessing) or ≥5 distinct accounts (spraying) from one source.
+
+**What would you do next?** Validate the original rules (LSASS dump, shadow-copy deletion) with Atomic Red Team, Entra ID sign-in detections, deploying rules to Sentinel via GitHub Action, and CTI enrichment (MISP/OpenCTI).
 
 **How does this relate to NIS2/DORA?** NIS2 Art. 21 requires incident-handling measures and Art. 23 has reporting timelines; DORA Art. 10 requires detection of anomalous activities and Art. 19 covers major-incident reporting. Detections + tested evidence + traceability = audit evidence. (Say "indicative mapping" — you are not giving legal advice.)
 
-**Tell me about a mistake/bug.** Have a real one ready from your build, e.g. a benign command that triggered a rule and how you tuned it, or an evaluator edge case (aggregation conditions now fail loudly instead of silently passing).
+**Tell me about a mistake/bug.** Real ones from this build:
+* *Real data caught a sanitiser bug.* My importer pseudonymises usernames by rewriting `C:\Users\<name>`, but it also rewrote `C:\Users\Public`. That's the exact staging path my rundll32 rule keys on. When I imported real lab events, the rundll32 test failed, and that's how I found it. I fixed it to keep shared profile folders and added a regression test. Lesson: sanitisation can silently change detection semantics.
+* *"Splunk won't open" for weeks.* TCP to port 8000 succeeded, but browsers and curl got "connection reset". Splunk Web was HTTP-only and I was using `https://`. Then no data arrived, because the forwarder still pointed at a retired Splunk VM. Then Sysmon specifically was missing: the forwarder runs as a low-privilege service account and got access denied (errorCode=5) on the Sysmon channel, fixed by adding it to Event Log Readers. Lesson: test each layer separately (TCP, TLS, app, data path, permissions).
 
 ## STAR story (behavioural)
-* **S**: SOCs drown in untested, noisy detections. **T**: Show I can build reliable detections end to end. **A**: Designed DetectForge with CI gates, benign regression, coverage analysis and correlation; validated in a lab. **R**: 13 rules, 31 tests, 0 FPs on the corpus, 9 alerts → 1 prioritised incident, coverage gaps driving the roadmap.
+* **S**: SOCs drown in untested, noisy detections. **T**: Show I can build reliable detections end to end. **A**: Designed DetectForge with CI gates, benign regression, coverage analysis and correlation; validated in a lab. **R**: 19 detections deployed as live Splunk alerts, 45 tests, 0 FPs on the corpus, 5 simulated techniques each raising exactly the intended alert in the lab, 9 alerts → 1 prioritised incident, 78% priority coverage with the gaps driving the roadmap.
