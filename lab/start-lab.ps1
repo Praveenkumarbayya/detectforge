@@ -77,7 +77,7 @@ while ((Get-Date) -lt $deadline) {
     if ($r.StatusCode -eq 200) {
       Write-Host "`nSplunk Web is up."
       Write-Host "  From the host:        http://127.0.0.1:8000"
-      Write-Host "  From inside WIN-LAB:  http://$splunkIp`:8000   (http, not https)"
+      Write-Host "  From inside WIN-LAB:  http://192.168.56.1:8000   (http, not https - https gets 'connection reset')"
       return
     }
   } catch { Write-Host -NoNewline '.'; Start-Sleep -Seconds 5 }

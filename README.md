@@ -87,8 +87,10 @@ powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1         # start lab
 powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1 -Stop   # save state
 ```
 
-Inside WIN-LAB, open **http://10.0.2.4:8000** (HTTP, not HTTPS). From the host, use http://127.0.0.1:8000.
-If Splunk "won't open" in WIN-LAB, the usual cause is that `UBU-SPLUNK` is powered off. Run the script.
+Inside WIN-LAB, open **http://192.168.56.1:8000**. That's the host's host-only address, forwarded to Splunk on 10.0.2.4.
+From the host, use http://127.0.0.1:8000. Splunk Web here is plain **HTTP**: `https://` gets "connection reset"
+(curl error 35). If Splunk "won't open" in WIN-LAB, check those two things first: use `http://`, and make sure
+`UBU-SPLUNK` is powered on (run the script).
 
 ## Writing a new detection (the workflow)
 
