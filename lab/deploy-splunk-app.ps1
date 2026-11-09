@@ -30,6 +30,11 @@ Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
 New-Item -ItemType Directory $stage | Out-Null
 Copy-Item (Join-Path $PSScriptRoot 'splunk\detectforge_lab') $stage -Recurse
 Copy-Item (Join-Path $repo 'out\splunk\savedsearches.conf') (Join-Path $stage 'detectforge_lab\local\savedsearches.conf')
+# Serve the purple-team simulations to WIN-LAB over Splunk Web (no extra ports or shares on the isolated network):
+#   http://192.168.56.1:8000/en-US/static/app/detectforge_lab/simulations.ps1
+$static = Join-Path $stage 'detectforge_lab\appserver\static'
+New-Item -ItemType Directory $static -Force | Out-Null
+Copy-Item (Join-Path $PSScriptRoot 'purple\simulations.ps1') $static
 
 # 3. Ship and restart
 & docker cp (Join-Path $stage 'detectforge_lab') "${Container}:/opt/splunk/etc/apps/"

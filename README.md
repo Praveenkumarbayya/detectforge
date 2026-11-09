@@ -130,10 +130,18 @@ Sysmon → Universal Forwarder → Splunk → DetectForge scheduled alert.
 | `rundll32 C:\Users\Public\x.dll,…` | Rundll32 Proxy Execution | T1218.011 |
 | `copy … \\127.0.0.1\C$\…` | Admin Share Used for Remote Copy | T1021.002 |
 | 12 bad-password SMB logons across 6 fake accounts | Brute Force / Password Spray (native) | T1110.003 |
+| `schtasks /create … /tr C:\Users\Public\…` | Scheduled Task Pointing to User-Writable Path | T1053.005 |
+| `reg add …\CurrentVersion\Run …` | Registry Run Key Persistence | T1547.001 |
+| `net user dfsimuser /add` | Local User Account Created | T1136.001 |
+| `wevtutil cl <channel>` | Windows Event Logs Cleared | T1070.001 |
+| `certutil -urlcache -split -f http://…` | Certutil Used to Download | T1105 |
 
-Each simulated technique raised exactly one alert of the matching rule. No other DetectForge alert fired on normal
-WIN-LAB activity during the run. The real Sysmon events for the first four were sanitised and added to
-`tests/data/`, so CI now regression-tests the rules against genuine telemetry as well as hand-written samples.
+All simulations are in [`lab/purple/simulations.ps1`](lab/purple/simulations.ps1). Each simulated technique raised
+the matching alert and no other DetectForge alert fired. The one exception is real data showing a rule bug: the
+local-account rule fired **twice**, because `net.exe` re-launches itself as `net1.exe`. That's fixed and written up
+in [CHANGELOG.md](CHANGELOG.md). The real Sysmon events for 9 rules are sanitised into `tests/data/`, so CI
+regression-tests against genuine telemetry as well as hand-written samples. The lab's investigation work lives in
+[`cases/`](cases/README.md).
 
 ## Writing a new detection (the workflow)
 

@@ -3,12 +3,44 @@
     {
       "Image": "C:\\Windows\\System32\\net.exe",
       "CommandLine": "net user support$ P@ssw0rd! /add"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "CommandLine": "\"C:\\WINDOWS\\system32\\net.exe\" user dfsimuser /add",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ParentCommandLine": "\"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoProfile -ExecutionPolicy Bypass -File C:\\Users\\Public\\simulations.ps1 -Run T1053.005,T1547.001,T1136.001,T1070.001,T1105",
+      "User": "LAB\\user",
+      "OriginalFileName": "net.exe"
     }
   ],
   "should_not_match": [
     {
       "Image": "C:\\Windows\\System32\\net.exe",
       "CommandLine": "net user administrator"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\net1.exe",
+      "CommandLine": "C:\\WINDOWS\\system32\\net1 user dfsimuser /add",
+      "ParentImage": "C:\\Windows\\System32\\net.exe",
+      "ParentCommandLine": "\"C:\\WINDOWS\\system32\\net.exe\" user dfsimuser /add",
+      "User": "LAB\\user",
+      "OriginalFileName": "net1.exe"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "CommandLine": "\"C:\\WINDOWS\\system32\\net.exe\" user dfsimuser /delete",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ParentCommandLine": "\"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoProfile -ExecutionPolicy Bypass -File C:\\Users\\Public\\simulations.ps1 -Run T1053.005,T1547.001,T1136.001,T1070.001,T1105",
+      "User": "LAB\\user",
+      "OriginalFileName": "net.exe"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\net1.exe",
+      "CommandLine": "C:\\WINDOWS\\system32\\net1 user dfsimuser /delete",
+      "ParentImage": "C:\\Windows\\System32\\net.exe",
+      "ParentCommandLine": "\"C:\\WINDOWS\\system32\\net.exe\" user dfsimuser /delete",
+      "User": "LAB\\user",
+      "OriginalFileName": "net1.exe"
     }
   ]
 }

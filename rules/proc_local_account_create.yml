@@ -1,11 +1,14 @@
 title: Local User Account Created via net.exe
 id: a2989499-cbe0-4e29-bec8-932ccb5664df
 status: test
-description: Creation of a local account with 'net user /add' - backdoor account persistence.
+description: Creation of a local account with 'net user /add' - backdoor account persistence. net.exe re-launches
+  itself as net1.exe with the same command line, so the net1.exe child of net.exe is filtered to give one alert per
+  action. net1.exe run directly (a known way to dodge net.exe-only rules) still alerts.
 references:
 - https://attack.mitre.org/techniques/T1136/001/
 author: Praveen
 date: '2026-09-19'
+modified: '2026-11-09'
 tags:
 - attack.persistence
 - attack.t1136.001
@@ -21,7 +24,10 @@ detection:
     CommandLine|contains|all:
     - user
     - ' /add'
-  condition: sel_img and sel_cmd
+  filter_net1_child:
+    Image|endswith: \net1.exe
+    ParentImage|endswith: \net.exe
+  condition: sel_img and sel_cmd and not filter_net1_child
 falsepositives:
 - Provisioning scripts on lab/kiosk machines
 level: high
