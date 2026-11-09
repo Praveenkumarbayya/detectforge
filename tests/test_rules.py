@@ -45,6 +45,17 @@ def test_importer_sanitises_and_appends(tmp_path):
     p = importer.add_to_tests("demo", ev, "should_match", tmp_path)
     assert json.loads(p.read_text())["should_match"] == ev
 
+def test_splunk_alerts_cover_every_windows_rule():
+    from detectforge import convert
+    conf, skipped = convert.to_splunk_savedsearches(RULES)
+    win = [r for r in RULES if r["logsource"].get("product") == "windows"]
+    assert conf.count("\n[DetectForge - ") + conf.startswith("[") == len(win)
+    assert all(r["logsource"].get("product") != "windows" for r in RULES if r["_stem"] in skipped)
+    for line in conf.splitlines():  # conf values must be single-line, searches must be index-scoped
+        if line.startswith("search = "):
+            assert line.startswith("search = index=sysmon EventCode=1 ")
+    assert "dispatch.index_earliest = -5m@m" in conf and "alert.track = 1" in conf
+
 def test_importer_keeps_shared_profile_paths():
     # Regression: real lab telemetry. C:\Users\Public is not personal data and rules depend on it.
     from detectforge import importer

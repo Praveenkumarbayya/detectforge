@@ -47,6 +47,9 @@ def cmd_coverage(a):
 def cmd_convert(a):
     n = convert.export_all(loader.load_rules(a.rules), a.out)
     print(f"compiled {n} rules -> {a.out}/splunk, {a.out}/kql, {a.out}/sentinel")
+    _, skipped = convert.to_splunk_savedsearches(loader.load_rules(a.rules))
+    print(f"Splunk alerts -> {a.out}/splunk/savedsearches.conf ({n - len(skipped)} rules; "
+          f"skipped, no lab data source: {', '.join(skipped) or 'none'})")
 
 
 def cmd_compliance(a):

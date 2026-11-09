@@ -1,0 +1,5 @@
+# Share the app's objects (indexes, field extraction, DetectForge alerts) system-wide,
+# so the alerts show under Activity > Triggered Alerts and the fields work in Search & Reporting.
+[]
+access = read : [ * ], write : [ admin ]
+export = system

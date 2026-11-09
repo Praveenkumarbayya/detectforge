@@ -3,7 +3,7 @@
 > Write detections like software: **Sigma rules → automated tests → CI → SIEM-ready content → ATT&CK coverage → compliance traceability.**
 > Built by a computing graduate (SC-200, ISO 27001 Lead Auditor) to show the full detection-engineering lifecycle, not just "I installed a SIEM".
 
-![CI](https://img.shields.io/badge/CI-GitHub_Actions-blue) ![Rules](https://img.shields.io/badge/rules-18-green) ![ATT%26CK](https://img.shields.io/badge/ATT%26CK-21_techniques-red) ![Tests](https://img.shields.io/badge/tests-42_passing-brightgreen)
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-blue) ![Rules](https://img.shields.io/badge/rules-18-green) ![ATT%26CK](https://img.shields.io/badge/ATT%26CK-21_techniques-red) ![Tests](https://img.shields.io/badge/tests-43_passing-brightgreen)
 
 ## Why this exists
 
@@ -31,6 +31,8 @@ flowchart LR
   C --> CI
   CI -->|pass| D[Compile<br/>convert.py]
   D --> S1[Splunk SPL]
+  D --> S3[Splunk scheduled alerts<br/>savedsearches.conf]
+  S3 -->|deploy-splunk-app.ps1| LAB[Lab Splunk<br/>WIN-LAB Sysmon via UF]
   D --> S2[Sentinel KQL + analytic rule YAML]
   A --> E[coverage.py] --> N[ATT&CK Navigator layer<br/>+ gap report]
   A --> G[compliance.py] --> M[NIS2 / DORA / ISO 27001 matrix]
@@ -47,10 +49,10 @@ pip install -r requirements.txt
 python -m detectforge validate     # lint gate: ATT&CK tags, UUID, false-positive guidance, tests exist
 python -m detectforge test         # TP/FP unit tests + 300-event benign corpus
 python -m detectforge coverage     # out/COVERAGE.md + out/attack_layer.json (load in ATT&CK Navigator)
-python -m detectforge convert      # out/splunk, out/kql, out/sentinel
+python -m detectforge convert      # out/splunk (+ savedsearches.conf alerts), out/kql, out/sentinel
 python -m detectforge compliance   # out/TRACEABILITY.md
 python -m detectforge hunt data/scenarios/ransomware_chain.jsonl
-pytest -q                          # 42 tests
+pytest -q                          # 43 tests
 ```
 
 ### Demo output (`hunt`)
