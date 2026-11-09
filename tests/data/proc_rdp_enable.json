@@ -1,0 +1,26 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\" /v fDenyTSConnections /t REG_DWORD /d 0 /f"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\netsh.exe",
+      "CommandLine": "netsh advfirewall firewall set rule group=\"remote desktop\" new enable=Yes"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CommandLine": "powershell Set-ItemProperty -Path 'HKLM:\\System\\CurrentControlSet\\Control\\Terminal Server' -Name fDenyTSConnections -Value 0"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\reg.exe",
+      "CommandLine": "reg query \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server\" /v fDenyTSConnections"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\netsh.exe",
+      "CommandLine": "netsh advfirewall firewall show rule name=all"
+    }
+  ]
+}

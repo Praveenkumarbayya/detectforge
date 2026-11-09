@@ -1,0 +1,39 @@
+title: Remote Desktop Enabled via Registry or Firewall Command
+id: 356fb921-bcaa-4cca-9f51-356a8eb05dfe
+status: test
+description: Turning on RDP from the command line, either by setting fDenyTSConnections to 0 or by opening the
+  Remote Desktop firewall rule group. Attackers do this before lateral movement or hands-on-keyboard access.
+references:
+- https://attack.mitre.org/techniques/T1021/001/
+- https://attack.mitre.org/techniques/T1112/
+author: Praveen
+date: '2026-11-09'
+tags:
+- attack.lateral_movement
+- attack.defense_evasion
+- attack.t1021.001
+- attack.t1112
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_reg:
+    CommandLine|contains|all:
+    - fDenyTSConnections
+    - '0'
+  sel_reg_tool:
+    CommandLine|contains:
+    - 'reg add'
+    - 'reg.exe add'
+    - Set-ItemProperty
+    - New-ItemProperty
+  sel_fw:
+    CommandLine|contains|all:
+    - netsh
+    - firewall
+    - remote desktop
+    - enable
+  condition: (sel_reg and sel_reg_tool) or sel_fw
+falsepositives:
+- Helpdesk or build scripts that enable RDP on new servers (allow-list known admin hosts and accounts)
+level: medium

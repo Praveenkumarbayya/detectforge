@@ -1,0 +1,22 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "CommandLine": "net use \\\\192.0.2.20\\ADMIN$ /user:LAB\\admin"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\cmd.exe",
+      "CommandLine": "cmd /c copy C:\\Users\\Public\\p.exe \\\\WS-007\\C$\\Windows\\Temp\\p.exe"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\net.exe",
+      "CommandLine": "net use \\\\fileserver\\departments /persistent:yes"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\cmd.exe",
+      "CommandLine": "cmd /c copy C:\\temp\\a.txt D:\\backup\\a.txt"
+    }
+  ]
+}

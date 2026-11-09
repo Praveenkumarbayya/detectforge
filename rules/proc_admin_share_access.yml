@@ -1,0 +1,32 @@
+title: Admin Share Mounted or Used for Remote Copy
+id: 4db95c3b-4dfa-44b6-a755-9a29ff2fd453
+status: test
+description: net use against C$ or ADMIN$, or copying a file to a remote admin share. Attackers use this to stage
+  tools on other hosts before running them remotely (PsExec-style lateral movement).
+references:
+- https://attack.mitre.org/techniques/T1021/002/
+author: Praveen
+date: '2026-11-09'
+tags:
+- attack.lateral_movement
+- attack.t1021.002
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_share:
+    CommandLine|contains:
+    - \C$
+    - \ADMIN$
+  sel_action:
+    CommandLine|contains:
+    - 'net use'
+    - 'net.exe use'
+    - copy
+    - xcopy
+    - robocopy
+    - Copy-Item
+  condition: sel_share and sel_action
+falsepositives:
+- IT admins and deployment tooling copying files to servers (baseline per admin account and jump host)
+level: medium

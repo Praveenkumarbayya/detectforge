@@ -1,0 +1,29 @@
+id: 88b359a4-95b1-4d08-b831-e09259b5e87d
+name: NTDS.dit Extraction via Ntdsutil or Shadow Copy
+description: Copying the Active Directory database (ntds.dit), either with ntdsutil "ifm" or by reading it from a volume shadow
+  copy. Whoever holds ntds.dit can crack or reuse every domain password hash.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- CredentialAccess
+relevantTechniques:
+- T1003
+query: |
+  SysmonProcessCreate
+  | where (Image endswith "\\ntdsutil.exe" and CommandLine contains "ifm") or (CommandLine contains "\\ntds.dit" and (CommandLine contains "copy" or CommandLine contains "esentutl" or CommandLine contains "HarddiskVolumeShadowCopy"))
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

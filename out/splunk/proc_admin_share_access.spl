@@ -1,0 +1,1 @@
+CommandLine IN ("*\\C$*", "*\\ADMIN$*") CommandLine IN ("*net use*", "*net.exe use*", "*copy*", "*xcopy*", "*robocopy*", "*Copy-Item*")

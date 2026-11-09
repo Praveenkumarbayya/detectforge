@@ -1,0 +1,31 @@
+id: 356fb921-bcaa-4cca-9f51-356a8eb05dfe
+name: Remote Desktop Enabled via Registry or Firewall Command
+description: Turning on RDP from the command line, either by setting fDenyTSConnections to 0 or by opening the Remote Desktop
+  firewall rule group. Attackers do this before lateral movement or hands-on-keyboard access.
+severity: Medium
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- LateralMovement
+- DefenseEvasion
+relevantTechniques:
+- T1021
+- T1112
+query: |
+  SysmonProcessCreate
+  | where ((CommandLine contains "fDenyTSConnections" and CommandLine contains "0") and (CommandLine contains "reg add" or CommandLine contains "reg.exe add" or CommandLine contains "Set-ItemProperty" or CommandLine contains "New-ItemProperty")) or (CommandLine contains "netsh" and CommandLine contains "firewall" and CommandLine contains "remote desktop" and CommandLine contains "enable")
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

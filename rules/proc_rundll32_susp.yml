@@ -1,0 +1,36 @@
+title: Rundll32 Proxy Execution of Script or User-Writable DLL
+id: 67887dfe-ab32-49c7-aa24-999df64f13aa
+status: test
+description: rundll32.exe running inline JavaScript, or loading a DLL from a user-writable folder (AppData, Temp,
+  Public, ProgramData). Both are common ways to run malicious code through a signed Windows binary.
+references:
+- https://attack.mitre.org/techniques/T1218/011/
+author: Praveen
+date: '2026-11-09'
+tags:
+- attack.defense_evasion
+- attack.t1218.011
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  sel_img:
+    Image|endswith: \rundll32.exe
+  sel_script:
+    CommandLine|contains:
+    - 'javascript:'
+    - 'mshtml,RunHTMLApplication'
+  sel_path:
+    CommandLine|contains:
+    - \AppData\
+    - \Temp\
+    - \Users\Public\
+    - \ProgramData\
+  filter_known:
+    CommandLine|contains:
+    - \AppData\Local\Microsoft\Teams\
+    - \AppData\Local\Microsoft\OneDrive\
+  condition: sel_img and (sel_script or (sel_path and not filter_known))
+falsepositives:
+- Per-user installers and self-updating apps that ship DLLs in AppData (tune with filter_known)
+level: high

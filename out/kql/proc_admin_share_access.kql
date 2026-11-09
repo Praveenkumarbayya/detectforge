@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where (CommandLine contains "\\C$" or CommandLine contains "\\ADMIN$") and (CommandLine contains "net use" or CommandLine contains "net.exe use" or CommandLine contains "copy" or CommandLine contains "xcopy" or CommandLine contains "robocopy" or CommandLine contains "Copy-Item")

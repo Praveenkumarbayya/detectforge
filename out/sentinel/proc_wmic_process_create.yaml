@@ -1,0 +1,29 @@
+id: 5c2b9bd9-fb93-47b3-87c1-8fe25d7ccc82
+name: WMI Used to Launch a Process Locally or Remotely
+description: wmic "process call create" or PowerShell Invoke-WmiMethod / Invoke-CimMethod Win32_Process Create. Attackers
+  use WMI to start payloads without a direct parent-child link, and with /node to run them on other hosts.
+severity: Medium
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- Execution
+relevantTechniques:
+- T1047
+query: |
+  SysmonProcessCreate
+  | where (Image endswith "\\wmic.exe" and (CommandLine contains "process" and CommandLine contains "call" and CommandLine contains "create")) or ((CommandLine contains "Invoke-WmiMethod" or CommandLine contains "Invoke-CimMethod") and CommandLine contains "Win32_Process")
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

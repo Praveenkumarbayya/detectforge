@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where ((CommandLine contains "fDenyTSConnections" and CommandLine contains "0") and (CommandLine contains "reg add" or CommandLine contains "reg.exe add" or CommandLine contains "Set-ItemProperty" or CommandLine contains "New-ItemProperty")) or (CommandLine contains "netsh" and CommandLine contains "firewall" and CommandLine contains "remote desktop" and CommandLine contains "enable")

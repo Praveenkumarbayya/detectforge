@@ -11,6 +11,7 @@ by_tactic:
   credential_access:    {iso27001_2022: ["A.8.5 Secure authentication", "A.8.2 Privileged access rights"]}
   persistence:          {iso27001_2022: ["A.8.2 Privileged access rights", "A.8.9 Configuration management"]}
   privilege_escalation: {iso27001_2022: ["A.8.2 Privileged access rights"]}
-  initial_access:       {iso27001_2022: ["A.6.3 Awareness, education and training", "A.8.23 Web filtering"]}
+  lateral_movement:     {iso27001_2022: ["A.8.20 Network security", "A.8.22 Segregation of networks", "A.8.2 Privileged access rights"]}
+  initial_access:     {iso27001_2022: ["A.6.3 Awareness, education and training", "A.8.23 Web filtering"]}
   command_and_control:  {iso27001_2022: ["A.8.20 Network security", "A.8.23 Web filtering"]}
   impact:               {iso27001_2022: ["A.8.13 Information backup", "A.5.30 ICT readiness for business continuity"]}

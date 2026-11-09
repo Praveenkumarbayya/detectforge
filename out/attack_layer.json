@@ -22,9 +22,29 @@
       "comment": "LSASS Memory Dump via comsvcs.dll MiniDump"
     },
     {
+      "techniqueID": "T1003.003",
+      "score": 1,
+      "comment": "NTDS.dit Extraction via Ntdsutil or Shadow Copy"
+    },
+    {
+      "techniqueID": "T1021.001",
+      "score": 1,
+      "comment": "Remote Desktop Enabled via Registry or Firewall Command"
+    },
+    {
+      "techniqueID": "T1021.002",
+      "score": 1,
+      "comment": "Admin Share Mounted or Used for Remote Copy"
+    },
+    {
       "techniqueID": "T1027",
       "score": 1,
       "comment": "Suspicious Encoded PowerShell Command"
+    },
+    {
+      "techniqueID": "T1047",
+      "score": 1,
+      "comment": "WMI Used to Launch a Process Locally or Remotely"
     },
     {
       "techniqueID": "T1053.005",
@@ -52,6 +72,11 @@
       "comment": "Linux Download-and-Execute via curl/wget Piped to Shell; Certutil Used to Download or Decode Payloads"
     },
     {
+      "techniqueID": "T1112",
+      "score": 1,
+      "comment": "Remote Desktop Enabled via Registry or Firewall Command"
+    },
+    {
       "techniqueID": "T1136.001",
       "score": 1,
       "comment": "Local User Account Created via net.exe"
@@ -70,6 +95,11 @@
       "techniqueID": "T1218.005",
       "score": 1,
       "comment": "Mshta Executing Remote or Inline Script"
+    },
+    {
+      "techniqueID": "T1218.011",
+      "score": 1,
+      "comment": "Rundll32 Proxy Execution of Script or User-Writable DLL"
     },
     {
       "techniqueID": "T1490",

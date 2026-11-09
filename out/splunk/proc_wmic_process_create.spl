@@ -1,0 +1,1 @@
+(Image="*\\wmic.exe" CommandLine="*process*" CommandLine="*call*" CommandLine="*create*") OR (CommandLine IN ("*Invoke-WmiMethod*", "*Invoke-CimMethod*") CommandLine="*Win32_Process*")

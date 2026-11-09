@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where (Image endswith "\\wmic.exe" and (CommandLine contains "process" and CommandLine contains "call" and CommandLine contains "create")) or ((CommandLine contains "Invoke-WmiMethod" or CommandLine contains "Invoke-CimMethod") and CommandLine contains "Win32_Process")

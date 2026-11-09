@@ -1,0 +1,1 @@
+(CommandLine="*fDenyTSConnections*" CommandLine="*0*" CommandLine IN ("*reg add*", "*reg.exe add*", "*Set-ItemProperty*", "*New-ItemProperty*")) OR (CommandLine="*netsh*" CommandLine="*firewall*" CommandLine="*remote desktop*" CommandLine="*enable*")

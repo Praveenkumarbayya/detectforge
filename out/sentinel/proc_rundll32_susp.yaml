@@ -1,0 +1,29 @@
+id: 67887dfe-ab32-49c7-aa24-999df64f13aa
+name: Rundll32 Proxy Execution of Script or User-Writable DLL
+description: rundll32.exe running inline JavaScript, or loading a DLL from a user-writable folder (AppData, Temp, Public,
+  ProgramData). Both are common ways to run malicious code through a signed Windows binary.
+severity: High
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- DefenseEvasion
+relevantTechniques:
+- T1218
+query: |
+  SysmonProcessCreate
+  | where Image endswith "\\rundll32.exe" and ((CommandLine contains "javascript:" or CommandLine contains "mshtml,RunHTMLApplication") or ((CommandLine contains "\\AppData\\" or CommandLine contains "\\Temp\\" or CommandLine contains "\\Users\\Public\\" or CommandLine contains "\\ProgramData\\") and (not((CommandLine contains "\\AppData\\Local\\Microsoft\\Teams\\" or CommandLine contains "\\AppData\\Local\\Microsoft\\OneDrive\\")))))
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

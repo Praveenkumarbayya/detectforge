@@ -3,7 +3,7 @@
 > Write detections like software: **Sigma rules → automated tests → CI → SIEM-ready content → ATT&CK coverage → compliance traceability.**
 > Built by a computing graduate (SC-200, ISO 27001 Lead Auditor) to show the full detection-engineering lifecycle, not just "I installed a SIEM".
 
-![CI](https://img.shields.io/badge/CI-GitHub_Actions-blue) ![Rules](https://img.shields.io/badge/rules-13-green) ![ATT%26CK](https://img.shields.io/badge/ATT%26CK-15_techniques-red) ![Tests](https://img.shields.io/badge/tests-31_passing-brightgreen)
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-blue) ![Rules](https://img.shields.io/badge/rules-18-green) ![ATT%26CK](https://img.shields.io/badge/ATT%26CK-21_techniques-red) ![Tests](https://img.shields.io/badge/tests-41_passing-brightgreen)
 
 ## Why this exists
 
@@ -50,7 +50,7 @@ python -m detectforge coverage     # out/COVERAGE.md + out/attack_layer.json (lo
 python -m detectforge convert      # out/splunk, out/kql, out/sentinel
 python -m detectforge compliance   # out/TRACEABILITY.md
 python -m detectforge hunt data/scenarios/ransomware_chain.jsonl
-pytest -q                          # 31 tests
+pytest -q                          # 41 tests
 ```
 
 ### Demo output (`hunt`)
@@ -66,11 +66,29 @@ kill chain: initial_access -> execution -> persistence -> defense_evasion -> cre
   >> RECOMMENDED: isolate host, reset user creds, preserve memory image, start IR runbook
 ```
 
-## Detection library (13 rules)
+## Detection library (18 rules)
 
 Phishing macro → encoded PowerShell → certutil download → scheduled-task persistence → LSASS dump → Defender tamper →
-shadow-copy deletion → log clearing, plus Linux reverse-shell and curl|bash droppers. Each rule documents **false positives**
-and maps to MITRE ATT&CK. See `out/COVERAGE.md` for the current gap list (currently 15/28 priority techniques, 53%).
+shadow-copy deletion → log clearing, plus rundll32 proxy execution, WMI process creation, RDP enabling, admin-share
+lateral movement, NTDS.dit theft, and Linux reverse-shell and curl|bash droppers. Each rule documents **false positives**
+and maps to MITRE ATT&CK. See `out/COVERAGE.md` for the current gap list (currently 21/28 priority techniques, 75%).
+
+## Home lab (VirtualBox)
+
+| VM | Role | Address on `LabNet` (10.0.2.0/24) |
+|---|---|---|
+| `WIN-LAB` | Windows 11 + Sysmon, Atomic Red Team target | DHCP (10.0.2.3) |
+| `UBU-SPLUNK` | Splunk Enterprise (Splunk Web, HTTP) | **10.0.2.4** (fixed DHCP lease) |
+
+Start everything with one command. It pins the Splunk IP, starts any VM that's off, and waits until Splunk Web answers:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1         # start lab
+powershell -ExecutionPolicy Bypass -File lab\start-lab.ps1 -Stop   # save state
+```
+
+Inside WIN-LAB, open **http://10.0.2.4:8000** (HTTP, not HTTPS). From the host, use http://127.0.0.1:8000.
+If Splunk "won't open" in WIN-LAB, the usual cause is that `UBU-SPLUNK` is powered off. Run the script.
 
 ## Writing a new detection (the workflow)
 

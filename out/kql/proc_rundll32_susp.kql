@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where Image endswith "\\rundll32.exe" and ((CommandLine contains "javascript:" or CommandLine contains "mshtml,RunHTMLApplication") or ((CommandLine contains "\\AppData\\" or CommandLine contains "\\Temp\\" or CommandLine contains "\\Users\\Public\\" or CommandLine contains "\\ProgramData\\") and (not((CommandLine contains "\\AppData\\Local\\Microsoft\\Teams\\" or CommandLine contains "\\AppData\\Local\\Microsoft\\OneDrive\\")))))

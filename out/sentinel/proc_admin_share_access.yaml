@@ -1,0 +1,29 @@
+id: 4db95c3b-4dfa-44b6-a755-9a29ff2fd453
+name: Admin Share Mounted or Used for Remote Copy
+description: net use against C$ or ADMIN$, or copying a file to a remote admin share. Attackers use this to stage tools on
+  other hosts before running them remotely (PsExec-style lateral movement).
+severity: Medium
+status: Available
+requiredDataConnectors: []
+queryFrequency: PT15M
+queryPeriod: PT15M
+triggerOperator: GreaterThan
+triggerThreshold: 0
+tactics:
+- LateralMovement
+relevantTechniques:
+- T1021
+query: |
+  SysmonProcessCreate
+  | where (CommandLine contains "\\C$" or CommandLine contains "\\ADMIN$") and (CommandLine contains "net use" or CommandLine contains "net.exe use" or CommandLine contains "copy" or CommandLine contains "xcopy" or CommandLine contains "robocopy" or CommandLine contains "Copy-Item")
+entityMappings:
+- entityType: Host
+  fieldMappings:
+  - identifier: HostName
+    columnName: Computer
+- entityType: Process
+  fieldMappings:
+  - identifier: CommandLine
+    columnName: CommandLine
+version: 1.0.0
+kind: Scheduled

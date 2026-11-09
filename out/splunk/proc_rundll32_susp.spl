@@ -1,0 +1,1 @@
+Image="*\\rundll32.exe" CommandLine IN ("*javascript:*", "*mshtml,RunHTMLApplication*") OR (CommandLine IN ("*\\AppData\\*", "*\\Temp\\*", "*\\Users\\Public\\*", "*\\ProgramData\\*") NOT (CommandLine IN ("*\\AppData\\Local\\Microsoft\\Teams\\*", "*\\AppData\\Local\\Microsoft\\OneDrive\\*")))

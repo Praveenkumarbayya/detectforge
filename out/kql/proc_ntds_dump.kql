@@ -1,0 +1,2 @@
+SysmonProcessCreate
+| where (Image endswith "\\ntdsutil.exe" and CommandLine contains "ifm") or (CommandLine contains "\\ntds.dit" and (CommandLine contains "copy" or CommandLine contains "esentutl" or CommandLine contains "HarddiskVolumeShadowCopy"))

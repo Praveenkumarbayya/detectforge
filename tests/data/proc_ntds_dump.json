@@ -1,0 +1,22 @@
+{
+  "should_match": [
+    {
+      "Image": "C:\\Windows\\System32\\ntdsutil.exe",
+      "CommandLine": "ntdsutil \"ac i ntds\" \"ifm\" \"create full C:\\Windows\\Temp\\x\" q q"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\cmd.exe",
+      "CommandLine": "cmd /c copy \\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\Windows\\NTDS\\ntds.dit C:\\Windows\\Temp\\n.dit"
+    }
+  ],
+  "should_not_match": [
+    {
+      "Image": "C:\\Windows\\System32\\ntdsutil.exe",
+      "CommandLine": "ntdsutil \"metadata cleanup\" q"
+    },
+    {
+      "Image": "C:\\Windows\\System32\\cmd.exe",
+      "CommandLine": "cmd /c dir C:\\Windows\\NTDS"
+    }
+  ]
+}
